@@ -75,13 +75,13 @@ iptables_lib = {
 
 
 class Settings(object):
-    ServerName: str = "gamma.kksctf.ru"
-    StartPort: int = 51820
+    ServerName: str = "highres.team"
+    StartPort: int = 443
     ClientCount: int = 10
     server_config_base: str = open(os.path.join(file_path, "server_base.conf"), "r").read()
     client_config_base: str = open(os.path.join(file_path, "client_base.conf"), "r").read()
     client_config_part: str = open(os.path.join(file_path, "client_part.conf"), "r").read()
-    ip_pool_base: str = "10.20.0.{cid}"
+    ip_pool_base: str = "10.20.{tid}.{cid}"
     PostUp: List[str] = []
     PostDown: List[str] = []
     ClientKeepAlive = None
