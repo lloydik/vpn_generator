@@ -60,7 +60,7 @@ class teamGenerator(object):
             env["client_num"] = client_num
             env["client_private_key"] = client[0]
             env["client_public_key"] = client[1]
-            tmp_ip = self.settings.ip_pool_base.format(cid=client_num + 2) if client_num and not team_idx else self.settings.ip_pool_vulnbox.format(tid=team_idx,cid=2)
+            tmp_ip = self.settings.ip_pool_base.format(cid=client_num + 2) if client_num or not team_idx else self.settings.ip_pool_vulnbox.format(tid=team_idx,cid=2)
             env["client_ip"] = tmp_ip + "/32"  # 0 and 1 reserved
             env["client_network"] = tmp_ip + "/24"  # todo: more networks?
             env["allowed_ips"] = env["client_ip"] + ',' + self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/24"
