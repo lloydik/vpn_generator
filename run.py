@@ -2,7 +2,7 @@
 
 import argparse
 import sys
-from config import teams
+from config import teams, vulnbox_net
 
 # from .settings import Settings
 # from .createVPN import teamGenerator
@@ -64,10 +64,15 @@ def main():
     else:
         for i, team in enumerate(teams):
             settings.ClientCount = team['clients']
-            settings.StartPort = 30000+i
+            settings.StartPort = 30000+i+1
             settings.ip_pool_base = team['ip_pool_base'] if 'ip_pool_base' in team.keys() else (args.ip_pool_base or settings.ip_pool_base).format(tid=i+1, cid='{cid}')
             gen = wg.createVPN.teamGenerator(team['team'], outDir, settings)
             gen.generate()
+            settings.ClientCount = 1
+            settings.StartPort = 31000+i+1
+            settings.ip_pool_base = vulnbox_net.format(tid=i+1, cid='{cid}')
+            gen = wg.createVPN.teamGenerator(team['team'], outDir, settings)
+            gen.generate(is_vulnbox=True)            
 
     # settings.server_config_base = args["server_config_base"] or settings.server_config_base
     # settings.client_config_base = args["client_config_base"] or settings.client_config_base

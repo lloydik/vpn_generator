@@ -29,7 +29,7 @@ teams = [
 ```
 git clone https://github.com/lloydik/vpn_generator.git
 cd vpn_generator
-chmod +x run.py && ./run.py -h
+chmod +x run.py start_all_configs.sh stop_all_configs.sh && ./run.py -h
 ```
 На этом моменте вы должны увидеть сообщение с описанием параметров. Пример использования вручную:
 ```

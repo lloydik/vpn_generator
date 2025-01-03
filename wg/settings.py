@@ -82,6 +82,7 @@ class Settings(object):
     client_config_base: str = open(os.path.join(file_path, "client_base.conf"), "r").read()
     client_config_part: str = open(os.path.join(file_path, "client_part.conf"), "r").read()
     ip_pool_base: str = "10.20.{tid}.{cid}"
+    ip_pool_vulnbox: str = "10.80.{tid}.{cid}"
     PostUp: List[str] = []
     PostDown: List[str] = []
     ClientKeepAlive = None

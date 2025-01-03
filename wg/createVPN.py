@@ -28,7 +28,7 @@ class teamGenerator(object):
         os.makedirs(self.epath, exist_ok=True)
         os.makedirs(self.cliexppath)
 
-    def generate(self):
+    def generate(self, is_vulnbox=False):
         server = self.generate_key(self.epath, "server")
         env = {
             "name": self.name,
@@ -49,16 +49,22 @@ class teamGenerator(object):
             "server_post_down": "; ".join(self.settings.PostDown),
         }
         client_parts = []
-        for client_num in range(self.settings.ClientCount+1): # 1 идёт на vulnbox
-            client = self.generate_key(self.epath, f"client{client_num}")
+        for client_num in range(self.settings.ClientCount):
+            if is_vulnbox:
+                client = self.generate_key(self.epath, f"vulnbox_{self.name}_{client_num}")
+            else:
+                client = self.generate_key(self.epath, f"clients_{self.name}_{client_num}")
             env["client_num"] = client_num
             env["client_private_key"] = client[0]
             env["client_public_key"] = client[1]
             env["client_ip"] = self.settings.ip_pool_base.format(cid=client_num + 2) + "/32"  # 0 and 1 reserved
             env["client_network"] = self.settings.ip_pool_base.format(cid=client_num + 2) + "/24"  # todo: more networks?
+            env["allowed_ips"] = self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/24"
+            if not is_vulnbox:
+                env["allowed_ips"] += ',' + env["client_ip"]
             client_parts.append(self.settings.client_config_part.format(**env))
-            conf_name = f"client{client_num}.conf" if client_num else f'{self.name}_vulnbox.conf'
-            with open(pjoin(self.cliexppath, conf_name), 'w') as f:
+            client_conf_name = f"client_{self.name}_{client_num}.conf"
+            with open(pjoin(self.cliexppath, client_conf_name), 'w') as f:
                 f.write(self.settings.client_config_base.format(**env))
 
         with open(pjoin(self.basepath, f"server_{self.name}.conf"), 'w') as f:
