@@ -40,7 +40,6 @@ def main():
     if args.clients >= 254:
         raise Exception("Too many clients")
 
-    settings.StartPort = args.port or settings.StartPort
     settings.ServerName = args.host or settings.ServerName
     settings.ClientKeepAlive = args.keepalive or settings.ClientKeepAlive
 
@@ -56,6 +55,7 @@ def main():
     print(settings.PostUp, settings.PostDown)
 
     if not args.config:
+        settings.StartPort = args.port or settings.StartPort
         settings.ClientCount = args.clients or settings.ClientCount
         settings.ip_pool_base = args.ip_pool_base if not '{tid}' in args.ip_pool_base else settings.ip_pool_base
         gen = wg.createVPN.teamGenerator(args.name, ".", settings)
@@ -63,6 +63,7 @@ def main():
     else:
         for i, team in enumerate(teams):
             settings.ClientCount = team['clients']
+            settings.StartPort = team['port']
             settings.ip_pool_base = team['ip_pool_base'] if 'ip_pool_base' in team.keys() else (args.ip_pool_base or settings.ip_pool_base).format(tid=i+1, cid='{cid}')
             gen = wg.createVPN.teamGenerator(team['team'], ".", settings)
             gen.generate()

@@ -5,18 +5,20 @@
 ```python
 teams = [
     {
-        'team':'TEAM1',
-        'clients': 2,
+        'team':'Highres',
+        'clients': 3,
+        'port':5001,
     },
     {
-        'team':'TEAM2',
-        'clients': 2,
+        'team':'DumpRats',
+        'clients': 5,
+        'port':5002,
     },
-    ...
     {
-        'team':'TEAMN',
-        'clients': N,
-        'ip_pool_base': '10.20.N.{cid}'
+        'team':'tester',
+        'clients': 4,
+        'ip_pool_base': '10.20.13.{cid}',
+        'port':5003,
     },
 ]
 ```
@@ -44,7 +46,7 @@ chmod +x run.py && ./run.py -h
 # Постинсталейшен
 После запуска должны создасться директории с конфигами команд и сервера. Конфиги сервера перетаскиваем на сервер (удивительно), а затем запускаем конфиг
 ```
-wg-quick up server_highres1.conf
+wg-quick up server_*.conf
 ```
 
 Приятной игры
