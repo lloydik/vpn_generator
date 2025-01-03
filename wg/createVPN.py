@@ -49,7 +49,7 @@ class teamGenerator(object):
             "server_post_down": "; ".join(self.settings.PostDown),
         }
         client_parts = []
-        for client_num in range(self.settings.ClientCount+1): # 1 идёт под vulnbox
+        for client_num in range(self.settings.ClientCount+1): # 1 идёт на vulnbox
             client = self.generate_key(self.epath, f"client{client_num}")
             env["client_num"] = client_num
             env["client_private_key"] = client[0]

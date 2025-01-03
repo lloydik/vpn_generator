@@ -58,14 +58,15 @@ def main():
         settings.StartPort = args.port or settings.StartPort
         settings.ClientCount = args.clients or settings.ClientCount
         settings.ip_pool_base = args.ip_pool_base if not '{tid}' in args.ip_pool_base else settings.ip_pool_base
-        gen = wg.createVPN.teamGenerator(args.name, ".", settings)
+        outDir = args.output or '.'
+        gen = wg.createVPN.teamGenerator(args.name, outDir, settings)
         gen.generate()
     else:
         for i, team in enumerate(teams):
             settings.ClientCount = team['clients']
-            settings.StartPort = team['port']
+            settings.StartPort = 30000+i
             settings.ip_pool_base = team['ip_pool_base'] if 'ip_pool_base' in team.keys() else (args.ip_pool_base or settings.ip_pool_base).format(tid=i+1, cid='{cid}')
-            gen = wg.createVPN.teamGenerator(team['team'], ".", settings)
+            gen = wg.createVPN.teamGenerator(team['team'], outDir, settings)
             gen.generate()
 
     # settings.server_config_base = args["server_config_base"] or settings.server_config_base
