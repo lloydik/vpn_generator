@@ -50,18 +50,14 @@ class teamGenerator(object):
         }
         client_parts = []
         for client_num in range(self.settings.ClientCount):
-            if is_vulnbox:
-                client = self.generate_key(self.epath, f"vulnbox_{self.name}_{client_num}")
-            else:
-                client = self.generate_key(self.epath, f"clients_{self.name}_{client_num}")
+            client = self.generate_key(self.epath, f"clients_{self.name}_{client_num}")
             env["client_num"] = client_num
             env["client_private_key"] = client[0]
             env["client_public_key"] = client[1]
-            env["client_ip"] = self.settings.ip_pool_base.format(cid=client_num + 2) + "/32"  # 0 and 1 reserved
-            env["client_network"] = self.settings.ip_pool_base.format(cid=client_num + 2) + "/24"  # todo: more networks?
-            env["allowed_ips"] = self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/24"
-            if not is_vulnbox:
-                env["allowed_ips"] += ',' + env["client_ip"]
+            tmp_ip = self.settings.ip_pool_base.format(cid=client_num + 2) if client_num else self.settings.ip_pool_vulnbox.format(tid=0,cid=2)
+            env["client_ip"] = tmp_ip + "/32"  # 0 and 1 reserved
+            env["client_network"] = tmp_ip + "/24"  # todo: more networks?
+            env["allowed_ips"] = env["client_ip"] + ',' + self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/24"
             client_parts.append(self.settings.client_config_part.format(**env))
             client_conf_name = f"client_{self.name}_{client_num}.conf"
             with open(pjoin(self.cliexppath, client_conf_name), 'w') as f:

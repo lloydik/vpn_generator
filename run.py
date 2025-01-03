@@ -68,6 +68,8 @@ def main():
             settings.ip_pool_base = team['ip_pool_base'] if 'ip_pool_base' in team.keys() else (args.ip_pool_base or settings.ip_pool_base).format(tid=i+1, cid='{cid}')
             gen = wg.createVPN.teamGenerator(team['team'], outDir, settings)
             gen.generate()
+
+            
             settings.ClientCount = 1
             settings.StartPort = 31000+i+1
             settings.ip_pool_base = vulnbox_net.format(tid=i+1, cid='{cid}')
