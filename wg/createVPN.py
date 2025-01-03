@@ -50,7 +50,11 @@ class teamGenerator(object):
         }
         client_parts = []
         for client_num in range(self.settings.ClientCount):
-            client = self.generate_key(self.epath, f"clients_{self.name}_{client_num}")
+            
+            if not client_num:
+                client = self.generate_key(self.epath, f"vulnbox_{self.name}")
+            else:
+                client = self.generate_key(self.epath, f"clients_{self.name}_{client_num}")
             if not client_num:
                 env['port'] += 1000 # lol wtf???
             env["client_num"] = client_num
@@ -62,6 +66,9 @@ class teamGenerator(object):
             env["allowed_ips"] = env["client_ip"] + ',' + self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/24"
             client_parts.append(self.settings.client_config_part.format(**env))
             client_conf_name = f"client_{self.name}_{client_num}.conf"
+            if not client_num:
+                client_conf_name = f"vulnbox_{self.name}.conf"
+            
             with open(pjoin(self.cliexppath, client_conf_name), 'w') as f:
                 f.write(self.settings.client_config_base.format(**env))
 
