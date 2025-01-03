@@ -79,6 +79,16 @@ class teamGenerator(object):
             f.write(self.settings.server_config_base.format(**env))
             f.write("\n\n" + "\n".join(client_parts))
 
+        vulnbox_server = self.generate_key(self.epath, "server_vulnbox")
+        env['server_private_key'] = vulnbox_server[0]
+        env['server_public_key'] = vulnbox_server[1]
+        env['port'] = self.settings.StartPort + 1000
+        with open(pjoin(self.basepath, f"server_vulnbox{self.name}.conf"), 'w') as f:
+            print(env)
+            f.write(self.settings.server_config_base.format(**env))
+            f.write("\n\n" + "\n".join(client_parts))
+        
+
         p = subprocess.Popen("tar -cvf " + f"clients_{self.name}.tar ./*", cwd=self.cliexppath, shell=True)
         p.wait()
 
