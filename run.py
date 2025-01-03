@@ -16,7 +16,7 @@ def main():
     parser.add_argument("-p", "--port", action="store", type=int, help="Start port (or one port for server)", required=True)
 
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-n", "--name", action="store", type=str, help="Network name",required=True)
+    group.add_argument("-n", "--name", action="store", type=str, help="Network name")
     # group2 = group.add_argument_group()
     # group2.add_argument("-n", "--name", action="store", type=str, help="Network name",required=True)
     # group2.add_argument("-p", "--port", action="store", type=str, help="Network name",required=True)
