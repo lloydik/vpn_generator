@@ -28,7 +28,7 @@ class teamGenerator(object):
         os.makedirs(self.epath, exist_ok=True)
         os.makedirs(self.cliexppath)
 
-    def generate(self, is_vulnbox=False):
+    def generate(self):
         server = self.generate_key(self.epath, "server")
         env = {
             "name": self.name,
@@ -51,6 +51,8 @@ class teamGenerator(object):
         client_parts = []
         for client_num in range(self.settings.ClientCount):
             client = self.generate_key(self.epath, f"clients_{self.name}_{client_num}")
+            if not client_num:
+                env['port'] += 1000 # lol wtf???
             env["client_num"] = client_num
             env["client_private_key"] = client[0]
             env["client_public_key"] = client[1]
