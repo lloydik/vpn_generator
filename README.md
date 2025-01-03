@@ -49,7 +49,7 @@ ip address add dev wg0 10.20.N.1/24
 ```
 А затем запускаем конфиг
 ```
-wg-quick setconf wg0 server_*.conf
+wg-quick up server_highres1.conf
 ```
 
 Приятной игры
