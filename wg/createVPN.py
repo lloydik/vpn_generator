@@ -83,7 +83,7 @@ class teamGenerator(object):
         env['server_private_key'] = vulnbox_server[0]
         env['server_public_key'] = vulnbox_server[1]
         env['port'] = self.settings.StartPort + 1000
-        with open(pjoin(self.basepath, f"server_vulnbox{self.name}.conf"), 'w') as f:
+        with open(pjoin(self.basepath, f"server_vuln{team_idx}.conf"), 'w') as f:
             print(env)
             f.write(self.settings.server_config_base.format(**env))
             f.write("\n\n" + "\n".join(client_parts))
