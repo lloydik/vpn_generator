@@ -49,7 +49,7 @@ class teamGenerator(object):
             "server_post_down": "; ".join(self.settings.PostDown),
         }
         client_parts = []
-        for client_num in range(self.settings.ClientCount):
+        for client_num in range(self.settings.ClientCount+1): # 1 идёт под vulnbox
             client = self.generate_key(self.epath, f"client{client_num}")
             env["client_num"] = client_num
             env["client_private_key"] = client[0]
@@ -57,7 +57,8 @@ class teamGenerator(object):
             env["client_ip"] = self.settings.ip_pool_base.format(cid=client_num + 2) + "/32"  # 0 and 1 reserved
             env["client_network"] = self.settings.ip_pool_base.format(cid=client_num + 2) + "/24"  # todo: more networks?
             client_parts.append(self.settings.client_config_part.format(**env))
-            with open(pjoin(self.cliexppath, f"client{client_num}.conf"), 'w') as f:
+            conf_name = f"client{client_num}.conf" if client_num else f'{self.name}_vulnbox.conf'
+            with open(pjoin(self.cliexppath, conf_name), 'w') as f:
                 f.write(self.settings.client_config_base.format(**env))
 
         with open(pjoin(self.basepath, f"server_{self.name}.conf"), 'w') as f:
