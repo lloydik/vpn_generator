@@ -53,12 +53,12 @@ def main():
 
     print(args)
     print(settings.PostUp, settings.PostDown)
+    outDir = args.output or '.'
 
     if not args.config:
         settings.StartPort = args.port or settings.StartPort
         settings.ClientCount = args.clients or settings.ClientCount
         settings.ip_pool_base = args.ip_pool_base if not '{tid}' in args.ip_pool_base else settings.ip_pool_base
-        outDir = args.output or '.'
         gen = wg.createVPN.teamGenerator(args.name, outDir, settings)
         gen.generate()
     else:
