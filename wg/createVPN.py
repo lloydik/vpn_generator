@@ -75,6 +75,7 @@ class teamGenerator(object):
                 vulnbox_peer = self.settings.client_config_part.format(**env)
             else:
                 env["server_internal_addr"] = self.settings.ip_pool_base.format(tid=team_idx, cid=1) + "/24"
+                env["allowed_ips"] += ',' + self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/16"
                 client_parts.append(self.settings.client_config_part.format(**env))
             
             with open(pjoin(self.cliexppath, client_conf_name), 'w') as f:
