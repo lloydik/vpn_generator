@@ -65,13 +65,13 @@ class teamGenerator(object):
             tmp_ip = self.settings.ip_pool_base.format(tid=team_idx, cid=client_num + 2) if (client_num != -1) or not team_idx else self.settings.ip_pool_vulnbox.format(tid=team_idx,cid=2)
             env["client_ip"] = tmp_ip + "/32"  # 0 and 1 reserved
             env["client_network"] = tmp_ip + "/24"  # todo: more networks?
-            env["allowed_ips"] = env["client_ip"] + ',' + self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/16"
+            env["allowed_ips"] = env["client_network"] #+ ',' + self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/16"
 
             client_conf_name = f"client_{self.name}_{client_num}.conf"
             if client_num == -1:
                 client_conf_name = f"vulnbox_{self.name}.conf"
                 env["server_internal_addr"] = self.settings.ip_pool_vulnbox.format(tid=team_idx,cid=1) + "/24"
-                env["allowed_ips"] += ',' + self.settings.ip_pool_base.format(tid=0,cid=0) + '/16'
+                # env["allowed_ips"] += ',' + self.settings.ip_pool_base.format(tid=0,cid=0) + '/16'
                 vulnbox_peer = self.settings.client_config_part.format(**env)
             else:
                 env["server_internal_addr"] = self.settings.ip_pool_base.format(tid=team_idx, cid=1) + "/24"

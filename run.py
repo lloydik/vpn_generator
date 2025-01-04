@@ -22,9 +22,6 @@ def main():
 
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-n", "--name", action="store", type=str, help="Network name")
-    # group2 = group.add_argument_group()
-    # group2.add_argument("-n", "--name", action="store", type=str, help="Network name",required=True)
-    # group2.add_argument("-p", "--port", action="store", type=str, help="Network name",required=True)
     group.add_argument("-C", "--config", action="store_true", help="Use config.py to generate configs", default=False)
     parser.add_argument("-c", "--clients", action="store", type=int, help="Clients count (default: 5)", default=5)
     parser.add_argument("-k", "--keepalive", action="store", type=int, help="Client keepalive (default: None)", default=None)
