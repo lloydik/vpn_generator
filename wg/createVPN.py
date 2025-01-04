@@ -49,6 +49,7 @@ class teamGenerator(object):
             "server_post_down": "; ".join(self.settings.PostDown),
         }
         client_parts = []
+        vulnbox_peer = ""
         for client_num in range(-1, self.settings.ClientCount):
             
             if client_num == -1:
@@ -66,12 +67,12 @@ class teamGenerator(object):
             env["client_ip"] = tmp_ip + "/32"  # 0 and 1 reserved
             env["client_network"] = tmp_ip + "/24"  # todo: more networks?
             env["allowed_ips"] = env["client_ip"] + ',' + self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/16"
-            
 
             client_conf_name = f"client_{self.name}_{client_num}.conf"
             if client_num == -1:
                 client_conf_name = f"vulnbox_{self.name}.conf"
                 env["server_internal_addr"] = self.settings.ip_pool_vulnbox.format(tid=team_idx,cid=1) + "/24"
+                vulnbox_peer = self.settings.client_config_part.format(**env)
             else:
                 env["server_internal_addr"] = self.settings.ip_pool_base.format(cid=1) + "/24"
                 client_parts.append(self.settings.client_config_part.format(**env))
@@ -93,7 +94,7 @@ class teamGenerator(object):
         with open(pjoin(self.basepath, f"server_vuln{team_idx}.conf"), 'w') as f:
             print(env)
             f.write(self.settings.server_config_base.format(**env))
-            f.write("\n\n" + "\n".join(client_parts))
+            f.write("\n\n" + vulnbox_peer)
         
 
         p = subprocess.Popen("tar -cvf " + f"clients_{self.name}.tar ./*", cwd=self.cliexppath, shell=True)
