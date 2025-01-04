@@ -76,7 +76,7 @@ iptables_lib = {
 
 class Settings(object):
     ServerName: str = "highres.team"
-    StartPort: int = 443
+    StartPort: int = 30000
     ClientCount: int = 10
     server_config_base: str = open(os.path.join(file_path, "server_base.conf"), "r").read()
     client_config_base: str = open(os.path.join(file_path, "client_base.conf"), "r").read()
