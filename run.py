@@ -3,11 +3,16 @@
 import argparse
 import sys
 from config import teams, vulnbox_net, vulnboxes_fw_rules
+from collections import namedtuple
 
 # from .settings import Settings
 # from .createVPN import teamGenerator
 import wg
 
+class Dict2Class(object): # cursed
+    def __init__(self, my_dict):
+        for key in my_dict:
+            setattr(self, key, my_dict[key])
 
 def main():
     parser = argparse.ArgumentParser(description='VPN configs generator for Attack Defense CTFs.')
@@ -57,7 +62,7 @@ def main():
     elif vulnboxes_fw_rules:
         for rule_name in vulnboxes_fw_rules.keys():
             rule = wg.settings.iptables_lib[rule_name]
-            conf_rule = vulnboxes_fw_rules[rule_name]
+            conf_rule = Dict2Class(vulnboxes_fw_rules[rule_name])
             pUp = rule["up"].format(n=conf_rule)
             pDown = rule["down"].format(n=conf_rule)
             settings.PostUp.append(pUp)
@@ -77,7 +82,7 @@ def main():
     else:
         for i, team in enumerate(teams):
             settings.ClientCount = team['clients']
-            settings.StartPort = 30000+i+1
+            settings.StartPort = settings.StartPort+i+1
             settings.ip_pool_base = team['ip_pool_base'] if 'ip_pool_base' in team.keys() else (args.ip_pool_base or settings.ip_pool_base).format(tid=i+1, cid='{cid}')
             gen = wg.createVPN.teamGenerator(team['team'], outDir, settings)
             gen.generate(i+1)
