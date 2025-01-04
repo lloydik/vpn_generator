@@ -14,3 +14,4 @@ teams = [
     },
 ]
 vulnbox_net = '10.80.{tid}.{cid}'
+clients_net = '10.20.{tid}.{cid}'
