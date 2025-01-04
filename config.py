@@ -15,3 +15,9 @@ teams = [
 ]
 vulnbox_net = '10.80.{tid}.{cid}'
 clients_net = '10.20.{tid}.{cid}'
+vulnboxes_fw_rules = {
+    'accept_io_ip': {
+        'fw_input_ip_ip':'10.20.0.0/16',
+        'fw_output_ip_ip':'10.20.0.0/16',
+    },
+}

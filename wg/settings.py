@@ -19,9 +19,14 @@ iptables_lib = {
         'down': "iptables -D FORWARD -i %i -j ACCEPT",
         'args': []
     },
-    'input_ip': {
-        'up': "iptables -A FORWARD -i %i -j ACCEPT -s {n.fw_input_ip_ip}",
-        'down': "iptables -D FORWARD -i %i -j ACCEPT -s {n.fw_input_ip_ip}",
+    'output': {
+        'up': "iptables -A FORWARD -o %i -j ACCEPT",
+        'down': "iptables -D FORWARD -o %i -j ACCEPT",
+        'args': []
+    },
+    'accept_io_ip': {
+        'up': "iptables -A FORWARD -i %i -j ACCEPT -s {n.fw_input_ip_ip} -d {n.fw_output_ip_ip}",
+        'down': "iptables -D FORWARD -i %i -j ACCEPT -s {n.fw_input_ip_ip} -d {n.fw_output_ip_ip}",
         'args': [
             {
                 "base": ["ip"],
@@ -33,21 +38,16 @@ iptables_lib = {
             }
         ]
     },
-    'output': {
-        'up': "iptables -A FORWARD -o %i -j ACCEPT",
-        'down': "iptables -D FORWARD -o %i -j ACCEPT",
-        'args': []
-    },
-    'output_ip': {
-        'up': "iptables -A FORWARD -o %i -j ACCEPT -d {n.fw_output_ip_ip}",
-        'down': "iptables -D FORWARD -o %i -j ACCEPT -d {n.fw_output_ip_ip}",
+    'block_io_ip': {
+        'up': "iptables -A FORWARD -o %i -j DROP  -s {n.fw_input_ip_ip} -d {n.fw_output_ip_ip}",
+        'down': "iptables -D FORWARD -o %i -j DROP  -s {n.fw_input_ip_ip} -d {n.fw_output_ip_ip}",
         'args': [
             {
                 "base": ["ip"],
                 "args": {
                     "action": "store",
                     "type": str,
-                    "help": "Ip for allowing connection",
+                    "help": "Ips for disallowing connection",
                 }
             }
         ]

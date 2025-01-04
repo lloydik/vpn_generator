@@ -2,7 +2,7 @@
 
 import argparse
 import sys
-from config import teams, vulnbox_net
+from config import teams, vulnbox_net, vulnboxes_fw_rules
 
 # from .settings import Settings
 # from .createVPN import teamGenerator
@@ -53,6 +53,16 @@ def main():
             pDown = rule["down"].format(n=args)
             settings.PostUp.append(pUp)
             settings.PostDown.append(pDown)
+
+    elif vulnboxes_fw_rules:
+        for rule_name in vulnboxes_fw_rules.keys():
+            rule = wg.settings.iptables_lib[rule_name]
+            conf_rule = vulnboxes_fw_rules[rule_name]
+            pUp = rule["up"].format(n=conf_rule)
+            pDown = rule["down"].format(n=conf_rule)
+            settings.PostUp.append(pUp)
+            settings.PostDown.append(pDown)
+
 
     print(args)
     print(settings.PostUp, settings.PostDown)
