@@ -65,7 +65,7 @@ class teamGenerator(object):
             tmp_ip = self.settings.ip_pool_base.format(tid=team_idx, cid=client_num + 2) if (client_num != -1) or not team_idx else self.settings.ip_pool_vulnbox.format(tid=team_idx,cid=2)
             env["client_ip"] = tmp_ip + "/32"  # 0 and 1 reserved
             env["client_network"] = tmp_ip + "/24"  # todo: more networks?
-            env["allowed_ips"] = env["client_network"] + ',' + self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/16"
+            
 
             client_conf_name = f"client_{self.name}_{client_num}.conf"
             if client_num == -1:
@@ -80,6 +80,10 @@ class teamGenerator(object):
                 client_parts.append(self.settings.client_config_part.format(**env))
             
             with open(pjoin(self.cliexppath, client_conf_name), 'w') as f:
+                if client_num == -1:
+                    env["allowed_ips"] = self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/16" +  ',' + self.settings.ip_pool_base.format(tid=0,cid=0) + '/16'
+                else:
+                    env["allowed_ips"] = env["client_network"] + ',' + self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/16"
                 f.write(self.settings.client_config_base.format(**env))
 
         with open(pjoin(self.basepath, f"server_{self.name}.conf"), 'w') as f:
