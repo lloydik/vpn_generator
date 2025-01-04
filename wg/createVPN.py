@@ -36,12 +36,12 @@ class teamGenerator(object):
             "server_ip": self.settings.ServerName,
             "port": self.settings.StartPort,
 
-            "subnet": self.settings.ip_pool_base.format(cid=0) + "/24",  # 0 and 1 reserved
+            "subnet": self.settings.ip_pool_base.format(tid=team_idx, cid=0) + "/24",  # 0 and 1 reserved
 
             "server_private_key": server[0],
             "server_public_key": server[1],
 
-            "server_internal_addr": self.settings.ip_pool_base.format(cid=1) + "/24",
+            "server_internal_addr": self.settings.ip_pool_base.format(tid=team_idx, cid=1) + "/24",
 
             "client_keep_alive": (f'PersistentKeepalive = {self.settings.ClientKeepAlive}' if self.settings.ClientKeepAlive else ''),
 
@@ -63,10 +63,10 @@ class teamGenerator(object):
             env["client_num"] = client_num
             env["client_private_key"] = client[0]
             env["client_public_key"] = client[1]
-            tmp_ip = self.settings.ip_pool_base.format(cid=client_num + 2) if (client_num != -1) or not team_idx else self.settings.ip_pool_vulnbox.format(tid=team_idx,cid=2)
+            tmp_ip = self.settings.ip_pool_base.format(tid=team_idx, cid=client_num + 2) if (client_num != -1) or not team_idx else self.settings.ip_pool_vulnbox.format(tid=team_idx,cid=2)
             env["client_ip"] = tmp_ip + "/32"  # 0 and 1 reserved
             env["client_network"] = tmp_ip + "/24"  # todo: more networks?
-            env["allowed_ips"] = env["client_ip"] + ',' + self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/16"
+            env["allowed_ips"] = env["client_ip"] + ',' + self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/16" + '' if (client_num != -1) else (self.settings.ip_pool_base.format(tid=0,cid=0) + '/16')
 
             client_conf_name = f"client_{self.name}_{client_num}.conf"
             if client_num == -1:
@@ -74,7 +74,7 @@ class teamGenerator(object):
                 env["server_internal_addr"] = self.settings.ip_pool_vulnbox.format(tid=team_idx,cid=1) + "/24"
                 vulnbox_peer = self.settings.client_config_part.format(**env)
             else:
-                env["server_internal_addr"] = self.settings.ip_pool_base.format(cid=1) + "/24"
+                env["server_internal_addr"] = self.settings.ip_pool_base.format(tid=team_idx, cid=1) + "/24"
                 client_parts.append(self.settings.client_config_part.format(**env))
             
             with open(pjoin(self.cliexppath, client_conf_name), 'w') as f:
