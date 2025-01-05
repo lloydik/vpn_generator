@@ -83,11 +83,13 @@ def main():
             settings.StartPort = (args.port or defaultPort) + i + 1
             gen = wg.createVPN.teamGenerator(team['team'], outDir, settings)
             gen.generateTeam(i+1)
+        for i, team in enumerate(teams):
+            settings.StartPort = (args.port or defaultPort) + i + 1 + 1000
+            settings.ip_pool_base = (args.ip_pool_base or settings.ip_pool_base)
+            gen = wg.createVPN.teamGenerator(f'vuln_{team["team"]}', outDir, settings)
+            gen.generateVulnbox(i+1)
         
-        settings.StartPort = (args.port or defaultPort) + i + 1 + 1000
-        settings.ip_pool_base = (args.ip_pool_base or settings.ip_pool_base)
-        gen = wg.createVPN.teamGenerator('vulnboxes', outDir, settings)
-        gen.generateVulnbox()
+        
     # settings.server_config_base = args["server_config_base"] or settings.server_config_base
     # settings.client_config_base = args["client_config_base"] or settings.client_config_base
     # settings.client_config_part = args["client_config_part"] or settings.client_config_part

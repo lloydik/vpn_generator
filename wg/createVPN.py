@@ -59,7 +59,7 @@ class teamGenerator(object):
             tmp_ip = self.settings.ip_pool_base.format(tid=team_idx, cid=client_num + 2)
             env["client_ip"] = tmp_ip + "/32"  # 0 and 1 reserved
             env["client_network"] = tmp_ip + "/24"  # todo: more networks?
-            client_conf_name = f"client_{self.name}_{client_num}.conf"
+            client_conf_name = f"{client_num}.conf"
             client_parts.append(self.settings.client_config_part.format(**env))
             
             with open(pjoin(self.cliexppath, client_conf_name), 'w') as f:
@@ -96,14 +96,14 @@ class teamGenerator(object):
             "client_post_up": f"route add -net {self.settings.ip_pool_base.format(tid=0, cid=0)}/16 gw {self.settings.ip_pool_vulnbox.format(tid=team_idx, cid=1)} ; ping -c1 {self.settings.ip_pool_base.format(tid=team_idx, cid=1)}",
             "client_post_down": f"route delete -net {self.settings.ip_pool_base.format(tid=0, cid=0)}/16 gw {self.settings.ip_pool_vulnbox.format(tid=team_idx, cid=1)}",
         }
-        client = self.generate_key(self.epath, f"vulnbox_{self.name}")
+        client = self.generate_key(self.epath, self.name)
         env["client_num"] = team_idx
         env["client_private_key"] = client[0]
         env["client_public_key"] = client[1]
         tmp_ip = self.settings.ip_pool_vulnbox.format(tid=team_idx, cid=2)
         env["client_ip"] = tmp_ip + "/32"  # 0 and 1 reserved
         env["client_network"] = tmp_ip + "/24"  # todo: more networks?
-        client_conf_name = f"vuln_{self.name}.conf"
+        client_conf_name = f"{self.name}.conf"
         vulnbox_peer = self.settings.client_config_part.format(**env)
         
         with open(pjoin(self.cliexppath, client_conf_name), 'w') as f:
