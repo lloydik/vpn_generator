@@ -28,7 +28,7 @@ class teamGenerator(object):
         os.makedirs(self.epath, exist_ok=True)
         os.makedirs(self.cliexppath)
 
-    def generateTeam(self, team_idx=None):
+    def generateTeam(self, team_idx):
         server = self.generate_key(self.epath, "server")
         env = {
             "name": self.name,
@@ -36,7 +36,7 @@ class teamGenerator(object):
             "server_ip": self.settings.ServerName,
             "port": self.settings.StartPort,
 
-            "subnet": self.settings.ip_pool_base.format(tid=team_idx, cid=0) + "/24",  # 0 and 1 reserved
+            "subnet": self.settings.ip_pool_base.format(tid=team_idx, cid=0) + "/24" + ',' + self.settings.ip_pool_vulnbox.format(tid=0, cid=0) + "/16",  # 0 and 1 reserved
 
             "server_private_key": server[0],
             "server_public_key": server[1],
@@ -47,68 +47,74 @@ class teamGenerator(object):
 
             "server_post_up": "; ".join(self.settings.PostUp),
             "server_post_down": "; ".join(self.settings.PostDown),
+            "client_post_up": f"route add -net {self.settings.ip_pool_vulnbox.format(tid=0, cid=0)}/16 gw {self.settings.ip_pool_base.format(tid=team_idx, cid=1)} ; ping -c1 {self.settings.ip_pool_base.format(tid=team_idx, cid=1)}",
+            "client_post_down": f"route delete -net {self.settings.ip_pool_vulnbox.format(tid=0, cid=0)}/16 gw {self.settings.ip_pool_base.format(tid=team_idx, cid=1)}",
         }
         client_parts = []
-        # vulnbox_peer = ""
         for client_num in range(self.settings.ClientCount):
-            # if client_num == -1:
-            #     client = self.generate_key(self.epath, f"vulnbox_{self.name}")
-            # else:
             client = self.generate_key(self.epath, f"clients_{self.name}_{client_num}")
-            # if client_num == -1:
-            #     env['port'] += 1000 # lol wtf???
-            # else:
-            #     env['port'] = self.settings.StartPort # lol wtf???
             env["client_num"] = client_num
             env["client_private_key"] = client[0]
             env["client_public_key"] = client[1]
-            # tmp_ip = self.settings.ip_pool_base.format(tid=team_idx, cid=client_num + 2) if (client_num != -1) or not team_idx else self.settings.ip_pool_vulnbox.format(tid=team_idx,cid=2)
             tmp_ip = self.settings.ip_pool_base.format(tid=team_idx, cid=client_num + 2)
             env["client_ip"] = tmp_ip + "/32"  # 0 and 1 reserved
             env["client_network"] = tmp_ip + "/24"  # todo: more networks?
             client_conf_name = f"client_{self.name}_{client_num}.conf"
-            # if client_num == -1:
-            #     client_conf_name = f"vulnbox_{self.name}.conf"
-            #     env["server_internal_addr"] = self.settings.ip_pool_vulnbox.format(tid=team_idx,cid=1) + "/24"
-            #     # env["allowed_ips"] += ',' + self.settings.ip_pool_base.format(tid=0,cid=0) + '/16'
-            #     env["allowed_ips"] = self.settings.ip_pool_vulnbox.format(tid=1,cid=0) + "/24" +  ',' + self.settings.ip_pool_base.format(tid=team_idx,cid=1) + '/16'
-            #     vulnbox_peer = self.settings.client_config_part.format(**env)
-            # else:
-                # env["server_internal_addr"] = self.settings.ip_pool_base.format(tid=team_idx, cid=1) + "/24"
-                # env["allowed_ips"] = env["client_network"]
-                # client_parts.append(self.settings.client_config_part.format(**env))
             client_parts.append(self.settings.client_config_part.format(**env))
             
             with open(pjoin(self.cliexppath, client_conf_name), 'w') as f:
-                # if client_num == -1:
-                #     env["allowed_ips"] = self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/16" +  ',' + self.settings.ip_pool_base.format(tid=0,cid=0) + '/16'
-                # else:
-                #     env["allowed_ips"] = env["client_network"] + ',' + self.settings.ip_pool_vulnbox.format(tid=0,cid=0) + "/16"
                 f.write(self.settings.client_config_base.format(**env))
 
         with open(pjoin(self.basepath, f"server_{self.name}.conf"), 'w') as f:
             print(env)
             f.write(self.settings.server_config_base.format(**env))
-            f.write("\n\n" + "\n".join(client_parts))
-
-        # generate vulnbox server
-        # vulnbox_server = self.generate_key(self.epath, "server_vulnbox")
-        # env['server_internal_addr'] = self.settings.ip_pool_vulnbox.format(tid=team_idx,cid=1) + "/24"
-        # env['server_private_key'] = vulnbox_server[0]
-        # env['server_public_key'] = vulnbox_server[1]
-        # env['port'] = self.settings.StartPort + 1000
-        # with open(pjoin(self.basepath, f"server_vuln{team_idx}.conf"), 'w') as f:
-        #     print(env)
-        #     f.write(self.settings.server_config_base.format(**env))
-        #     f.write("\n\n" + vulnbox_peer)
-        
+            f.write("\n\n" + "\n".join(client_parts))        
 
         p = subprocess.Popen("tar -cvf " + f"clients_{self.name}.tar ./*", cwd=self.cliexppath, shell=True)
         p.wait()
 
-    def generate_main_router(self):
-        pass
+        
+    def generateVulnbox(self, team_idx):
+        server = self.generate_key(self.epath, "server_vulnboxes")
+        env = {
+            "name": self.name,
 
+            "server_ip": self.settings.ServerName,
+            "port": self.settings.StartPort,
+
+            "subnet": self.settings.ip_pool_base.format(tid=0, cid=0) + "/16" + ',' + self.settings.ip_pool_vulnbox.format(tid=0, cid=0) + "/16",  # 0 and 1 reserved
+
+            "server_private_key": server[0],
+            "server_public_key": server[1],
+
+            "server_internal_addr": self.settings.ip_pool_vulnbox.format(tid=team_idx, cid=1) + "/24",
+
+            "client_keep_alive": (f'PersistentKeepalive = {self.settings.ClientKeepAlive}' if self.settings.ClientKeepAlive else ''),
+
+            "server_post_up": "; ".join(self.settings.PostUp),
+            "server_post_down": "; ".join(self.settings.PostDown),
+            "client_post_up": f"route add -net {self.settings.ip_pool_base.format(tid=0, cid=0)}/16 gw {self.settings.ip_pool_vulnbox.format(tid=team_idx, cid=1)} ; ping -c1 {self.settings.ip_pool_base.format(tid=team_idx, cid=1)}",
+            "client_post_down": f"route delete -net {self.settings.ip_pool_base.format(tid=0, cid=0)}/16 gw {self.settings.ip_pool_vulnbox.format(tid=team_idx, cid=1)}",
+        }
+        client = self.generate_key(self.epath, f"vulnbox_{self.name}")
+        env["client_num"] = team_idx
+        env["client_private_key"] = client[0]
+        env["client_public_key"] = client[1]
+        tmp_ip = self.settings.ip_pool_vulnbox.format(tid=team_idx, cid=2)
+        env["client_ip"] = tmp_ip + "/32"  # 0 and 1 reserved
+        env["client_network"] = tmp_ip + "/24"  # todo: more networks?
+        client_conf_name = f"vuln_{self.name}.conf"
+        vulnbox_peer = self.settings.client_config_part.format(**env)
+        
+        with open(pjoin(self.cliexppath, client_conf_name), 'w') as f:
+            f.write(self.settings.client_config_base.format(**env))
+
+        # generate vulnbox server
+        with open(pjoin(self.basepath, f"server_vuln{team_idx}.conf"), 'w') as f:
+            f.write(self.settings.server_config_base.format(**env))
+            f.write("\n\n" + vulnbox_peer)
+        
+    
     def generate_key(self, save_path: str, name: str) -> Tuple[str, str]:
         # private key gen
         _, privkey = self.wg_do(["genkey"])

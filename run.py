@@ -2,7 +2,7 @@
 
 import argparse
 import sys
-from config import teams, vulnbox_net, vulnboxes_fw_rules
+from config import teams, vulnbox_net, fw_rules
 from collections import namedtuple
 
 # from .settings import Settings
@@ -47,6 +47,7 @@ def main():
 
     settings.ServerName = args.host or settings.ServerName
     settings.ClientKeepAlive = args.keepalive or settings.ClientKeepAlive
+    settings.ip_pool_base = args.ip_pool_base or settings.ip_pool_base
 
     if args.fw_rules is not None:
         for rule_name in args.fw_rules:
@@ -56,10 +57,10 @@ def main():
             settings.PostUp.append(pUp)
             settings.PostDown.append(pDown)
 
-    elif vulnboxes_fw_rules:
-        for rule_name in vulnboxes_fw_rules.keys():
+    elif fw_rules:
+        for rule_name in fw_rules.keys():
             rule = wg.settings.iptables_lib[rule_name]
-            conf_rule = Dict2Class(vulnboxes_fw_rules[rule_name])
+            conf_rule = Dict2Class(fw_rules[rule_name])
             pUp = rule["up"].format(n=conf_rule)
             pDown = rule["down"].format(n=conf_rule)
             settings.PostUp.append(pUp)
@@ -69,20 +70,24 @@ def main():
     print(args)
     print(settings.PostUp, settings.PostDown)
     outDir = args.output or '.'
+    defaultPort = settings.StartPort
 
     if not args.config:
         settings.StartPort = args.port or settings.StartPort
         settings.ClientCount = args.clients or settings.ClientCount
-        settings.ip_pool_base = args.ip_pool_base if not '{tid}' in args.ip_pool_base else settings.ip_pool_base
         gen = wg.createVPN.teamGenerator(args.name, outDir, settings)
         gen.generateTeam()
     else:
         for i, team in enumerate(teams):
             settings.ClientCount = team['clients']
-            settings.StartPort = (args.port or settings.StartPort) + i + 1
-            settings.ip_pool_base = team['ip_pool_base'] if 'ip_pool_base' in team.keys() else (args.ip_pool_base or settings.ip_pool_base).format(tid=i+1, cid='{cid}')
+            settings.StartPort = (args.port or defaultPort) + i + 1
             gen = wg.createVPN.teamGenerator(team['team'], outDir, settings)
             gen.generateTeam(i+1)
+        
+        settings.StartPort = (args.port or defaultPort) + i + 1 + 1000
+        settings.ip_pool_base = (args.ip_pool_base or settings.ip_pool_base)
+        gen = wg.createVPN.teamGenerator('vulnboxes', outDir, settings)
+        gen.generateVulnbox()
     # settings.server_config_base = args["server_config_base"] or settings.server_config_base
     # settings.client_config_base = args["client_config_base"] or settings.client_config_base
     # settings.client_config_part = args["client_config_part"] or settings.client_config_part
