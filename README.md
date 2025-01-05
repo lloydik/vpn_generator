@@ -15,11 +15,29 @@ teams = [
     {
         'team':'tester',
         'clients': 4,
-        'ip_pool_base': '10.20.13.{cid}',
     },
 ]
-vulnbox_net = '10.80.{tid}.{cid}'
+vulnbox_net = '10.80.{cid}.{tid}'
 clients_net = '10.20.{tid}.{cid}'
+router_addr = '10.10.10.1/8'
+fw_rules = {
+    'accept_io_ip': {
+        'fw_input_ip_ip':'10.20.0.0/16',
+        'fw_output_ip_ip':'10.80.0.0/16',
+    },
+    'block_io_ip': {
+        'fw_input_ip_ip':'10.20.0.0/16',
+        'fw_output_ip_ip':'10.20.0.0/16',
+    },
+    'accept_io_ip': {
+        'fw_input_ip_ip':'10.80.0.0/16',
+        'fw_output_ip_ip':'10.20.0.0/16',
+    },
+    'accept_io_ip': {
+        'fw_input_ip_ip':'10.80.0.0/16',
+        'fw_output_ip_ip':'10.80.0.0/16',
+    },
+}
 ```
 ## ВОРНИНГ
 Поле `ip_pool_base` - необязательное, но лучше либо его не использовать вообще, либо использовать сразу во всех настройках команды
